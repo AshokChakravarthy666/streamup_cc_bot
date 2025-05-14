@@ -5,6 +5,7 @@ import os
 import requests
 from threading import Thread
 import asyncio
+from pyrogram.idle import idle
 
 # Load environment variables
 API_ID = int(os.getenv("API_ID"))
@@ -77,13 +78,16 @@ async def start(client, message: Message):
 
 # Start Pyrogram bot in a separate thread when FastAPI app starts
 @app.on_event("startup")
-def on_startup():
-    def run_bot():
-        asyncio.set_event_loop(asyncio.new_event_loop())  # <<< fix here
-        bot.run()
+async def on_startup():
+    await bot.start()
+    print("Bot started.")
+    asyncio.create_task(idle())  # keeps the bot running
 
-    Thread(target=run_bot).start()
-
+@app.on_event("shutdown")
+async def on_shutdown():
+    await bot.stop()
+    print("Bot stopped.")
+    
 # FastAPI route for health check
 @app.get("/")
 def root():
