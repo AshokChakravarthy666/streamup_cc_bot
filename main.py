@@ -4,6 +4,7 @@ from pyrogram.types import Message
 import os
 import requests
 from threading import Thread
+import asyncio
 
 # Load environment variables
 API_ID = int(os.getenv("API_ID"))
@@ -77,7 +78,11 @@ async def start(client, message: Message):
 # Start Pyrogram bot in a separate thread when FastAPI app starts
 @app.on_event("startup")
 def on_startup():
-    Thread(target=bot.run).start()
+    def run_bot():
+        asyncio.set_event_loop(asyncio.new_event_loop())  # <<< fix here
+        bot.run()
+
+    Thread(target=run_bot).start()
 
 # FastAPI route for health check
 @app.get("/")
