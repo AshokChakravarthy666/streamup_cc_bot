@@ -5,7 +5,7 @@ import os
 import requests
 from threading import Thread
 import asyncio
-from pyrogram.idle import idle
+from pyrogram import idle
 
 # Load environment variables
 API_ID = int(os.getenv("API_ID"))
